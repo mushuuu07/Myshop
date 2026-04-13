@@ -1,10 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const dotenv = require('dotenv');
-
-// Load environment variables
-dotenv.config();
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,19 +10,12 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Atlas Connection
+// MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB Atlas Connected Successfully'))
-  .catch((err) => {
-    console.error('❌ MongoDB Connection Error:', err.message);
-    process.exit(1);
-  });
+    .then(() => console.log('✅ MongoDB Atlas Connected Successfully'))
+    .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
-// Example API Route (you can add more later)
-app.get('/api/products', (req, res) => {
-  res.json({ message: 'This will return products from MongoDB soon!' });
-});
-// Simple User model (add this at the top)
+// Simple User Schema
 const userSchema = new mongoose.Schema({
     name: String,
     email: String,
@@ -33,23 +23,61 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
-// Register route
+// Address Schema
+const addressSchema = new mongoose.Schema({
+    fullName: String,
+    phone: String,
+    street: String,
+    city: String,
+    state: String,
+    pincode: String,
+    createdAt: { type: Date, default: Date.now }
+});
+const Address = mongoose.model('Address', addressSchema);
+
+// Payment Schema (for order)
+const paymentSchema = new mongoose.Schema({
+    method: String,
+    details: Object,
+    createdAt: { type: Date, default: Date.now }
+});
+const Payment = mongoose.model('Payment', paymentSchema);
+
+// Routes
+app.get('/api/products', (req, res) => {
+    res.json({ message: "Products API working" });
+});
+
 app.post('/register', async (req, res) => {
     try {
         const user = new User(req.body);
         await user.save();
-        res.status(201).json({ message: "User registered", user });
+        res.status(201).json({ message: "User registered successfully", user });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Important for Vercel (serverless)
-module.exports = app;
+app.post('/save-address', async (req, res) => {
+    try {
+        const address = new Address(req.body);
+        await address.save();
+        res.status(201).json({ message: "Address saved successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
-// For local development only
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
+app.post('/save-payment', async (req, res) => {
+    try {
+        const payment = new Payment(req.body);
+        await payment.save();
+        res.status(201).json({ message: "Order placed successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.listen(PORT, () => {
     console.log(`🚀 Server is running on http://localhost:${PORT}`);
-  });
-}
+});
