@@ -37,9 +37,6 @@ const products = Array.from({ length: 24 }, (_, i) => {
 let user = JSON.parse(localStorage.getItem('sc_user')) || null;
 let cart = [];
 
-// ====================== API BASE FOR VERCEL ======================
-const API_BASE = '';   // Empty = works perfectly on Vercel ( /api/register )
-
 // ====================== USER & HEADER ======================
 function handleAccountNav() {
     if (!user) {
@@ -141,7 +138,7 @@ async function submitToMongo() {
     }
 
     try {
-        const response = await fetch(`${API_BASE}/api/register`, {
+        const response = await fetch('/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, phone })
@@ -181,7 +178,7 @@ async function saveAddressToMongo() {
     }
 
     try {
-        const response = await fetch(`${API_BASE}/api/save-address`, {
+        const response = await fetch('/api/save-address', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(addressData)
@@ -226,7 +223,7 @@ async function savePaymentToMongo() {
     }
 
     try {
-        const response = await fetch(`${API_BASE}/api/save-payment`, {
+        const response = await fetch('/api/save-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(paymentData)
