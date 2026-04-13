@@ -35,8 +35,3 @@ if (process.env.NODE_ENV !== 'production') {
     console.log(`🚀 Server is running on http://localhost:${PORT}`);
   });
 }
-
-// ... your existing code ...
-
-// Add this at the very bottom if not present
-module.exports = app;
