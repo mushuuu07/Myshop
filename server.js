@@ -25,6 +25,24 @@ mongoose.connect(process.env.MONGODB_URI)
 app.get('/api/products', (req, res) => {
   res.json({ message: 'This will return products from MongoDB soon!' });
 });
+// Simple User model (add this at the top)
+const userSchema = new mongoose.Schema({
+    name: String,
+    email: String,
+    phone: String
+});
+const User = mongoose.model('User', userSchema);
+
+// Register route
+app.post('/register', async (req, res) => {
+    try {
+        const user = new User(req.body);
+        await user.save();
+        res.status(201).json({ message: "User registered", user });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 // Important for Vercel (serverless)
 module.exports = app;
