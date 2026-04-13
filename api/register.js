@@ -2,22 +2,23 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 export default async function handler(req, res) {
-    // Log for debugging
-    console.log("MONGODB_URI exists:", !!process.env.MONGODB_URI);
-
-    if (!process.env.MONGODB_URI) {
-        return res.status(500).json({ 
-            error: "MongoDB URI is not configured in Vercel Environment Variables" 
-        });
-    }
+    console.log("=== REGISTER API CALLED ===");
+    console.log("MONGODB_URI present:", !!process.env.MONGODB_URI);
 
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    if (!process.env.MONGODB_URI) {
+        return res.status(500).json({ 
+            error: "MONGODB_URI is NOT set in Vercel Environment Variables!" 
+        });
+    }
+
     try {
-        // Connect to MongoDB
-        await mongoose.connect(process.env.MONGODB_URI);
+        await mongoose.connect(process.env.MONGODB_URI, {
+            serverSelectionTimeoutMS: 5000
+        });
 
         const userSchema = new mongoose.Schema({
             name: String,
@@ -38,14 +39,13 @@ export default async function handler(req, res) {
 
         res.status(201).json({ 
             success: true, 
-            message: "Account created successfully!", 
-            user: newUser 
+            message: "Account created successfully!" 
         });
     } catch (error) {
-        console.error("Register Error:", error.message);
+        console.error("FULL ERROR:", error);
         res.status(500).json({ 
-            error: "Internal Server Error", 
-            details: error.message 
+            error: "Server Error", 
+            message: error.message 
         });
     }
 }
