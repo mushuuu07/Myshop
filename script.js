@@ -167,7 +167,7 @@ function goToPayment() {
 
     try {
         // 2. Send this data to your local backend server (running on port 3000)
-        const response = await fetch('http://localhost:3000/register', {
+        const response = await fetch('http://localhost:3000/register','https://myshop-six-hazel.vercel.app/' ,{
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userData)
@@ -201,7 +201,7 @@ function goToPayment() {
     const userData = { name: nameValue, email: emailValue, phone: phoneValue };
 
     try {
-        const response = await fetch('http://localhost:3000/register', {
+        const response = await fetch('http://localhost:5000/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userData)
