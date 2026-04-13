@@ -20,7 +20,7 @@ mongoose.connect(process.env.MONGODB_URI)
     process.exit(1);
   });
 
-// ====================== Schemas ======================
+// Schemas
 const userSchema = new mongoose.Schema({
     name: String,
     email: String,
@@ -29,32 +29,7 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
-const addressSchema = new mongoose.Schema({
-    fullName: String,
-    phone: String,
-    street: String,
-    city: String,
-    state: String,
-    pincode: String,
-    createdAt: { type: Date, default: Date.now }
-});
-const Address = mongoose.model('Address', addressSchema);
-
-const paymentSchema = new mongoose.Schema({
-    method: String,
-    details: Object,
-    createdAt: { type: Date, default: Date.now }
-});
-const Payment = mongoose.model('Payment', paymentSchema);
-
-// ====================== Routes ======================
-
-// Test route
-app.get('/api/products', (req, res) => {
-    res.json({ message: 'Products API is working!' });
-});
-
-// Register User
+// Routes
 app.post('/register', async (req, res) => {
     try {
         const { name, email, phone } = req.body;
@@ -62,47 +37,24 @@ app.post('/register', async (req, res) => {
             return res.status(400).json({ error: "All fields are required" });
         }
 
-        const user = new User({ name, email, phone });
-        await user.save();
+        const newUser = new User({ name, email, phone });
+        await newUser.save();
 
         res.status(201).json({ 
+            success: true,
             message: "User registered successfully", 
-            user 
+            user: newUser 
         });
     } catch (err) {
-        console.error(err);
+        console.error("Register Error:", err);
         res.status(500).json({ error: err.message });
     }
 });
 
-// Save Address
-app.post('/save-address', async (req, res) => {
-    try {
-        const address = new Address(req.body);
-        await address.save();
-        res.status(201).json({ message: "Address saved successfully" });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Save Payment / Place Order
-app.post('/save-payment', async (req, res) => {
-    try {
-        const payment = new Payment(req.body);
-        await payment.save();
-        res.status(201).json({ message: "Order placed successfully" });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// For Vercel serverless support
+// For Vercel (important)
 module.exports = app;
 
-// Local development only
+// Only run server locally
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
         console.log(`🚀 Server running on http://localhost:${PORT}`);
