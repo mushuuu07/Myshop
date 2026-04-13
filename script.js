@@ -37,9 +37,7 @@ let user = JSON.parse(localStorage.getItem('sc_user')) || null;
 let cart = [];
 
 // ==================== API BASE URL (Important for Local + Online) ====================
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:5000'   // Use this when testing locally
-    : '';                       // Empty = relative URL (works on Vercel/Render/Netlify when backend is on same domain)
+const API_BASE = '';   // Empty = relative path (works perfectly on Vercel)                      // Empty = relative URL (works on Vercel/Render/Netlify when backend is on same domain)
 
 // =================================================================================
 
