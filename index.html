@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopCart | Premium Shopping</title>
+    <link rel="stylesheet" href="/style.css">
+    
+</head>
+<body>
+  
+
+
+
+
+<header>
+    <div class="nav-main">
+        <div class="brand-logo" onclick="showPage('homePage')">ShopCart</div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search tech, home, and more...">
+            <div class="search-btn">🔍</div>
+        </div>
+        <div class="nav-right">
+            <div class="nav-item" onclick="showPage('loginPage')">
+                <span id="user-display">Hello, Sign in</span>
+                <strong>My Profile</strong>
+            </div>
+            <div class="nav-item" onclick="openCart()">
+                <span>Review</span>
+                <strong>🛒 Cart <span id="cart-count">0</span></strong>
+            </div>
+        </div>
+    </div>
+    <div class="nav-sub">
+        <span onclick="showPage('homePage')">Home</span>
+        <span onclick="showPage('productsPage')">All Products</span>
+        <span>Mobiles</span>
+        <span>Accessories</span>
+    </div>
+</header>
+
+
+      <!-- SPLASH SCREEN 
+
+<section id="splashPage" class="page active" style="display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#131921,#232f3e);color:white;flex-direction:column;">
+      <h1 style="font-size:48px;color:#febd69;">ShopCart</h1>
+      <p style="opacity:0.8;margin-top:10px;">Premium Digital Shopping</p>
+
+     <section id="productsPage" class="page">
+      <h2 style="text-align:center; margin-bottom:40px; font-size: 32px;">The ShopCart Catalog</h2>
+      <div class="product-grid" id="main-grid"></div>
+     </section> -->
+
+     <div>
+        <!--<button style="color: #000;
+        background-color: #e29635;
+        border-radius: 50px;
+        width: 190px;
+        height: 50px;
+        margin: 30px;
+        font-size: 15px;"> Scroll Down For Details</button>
+     </div>-->
+</section><br>
+
+
+<section id="homePage" class="page active">
+    <div class="hero-banner"></div>
+    <div class="intro-card">
+        <h1>Your Shopping, Simplified.</h1>
+        <p style="margin: 20px 0; color: #666; font-size: 18px;">Curated premium products with a touch of elegance. Start exploring the future of retail today.</p>
+        <button class="btn btn-yellow" style="width: 250px;" onclick="showPage('productsPage')">Browse Catalog</button>
+    </div>
+</section> 
+
+<section id="productsPage" class="page">
+    <h2 style="text-align:center; margin-bottom:40px; font-size: 32px;">The ShopCart Catalog</h2>
+    <div class="product-grid" id="main-grid"></div>
+</section> 
+
+<section id="descPage" class="page">
+    <div class="desc-wrapper" id="desc-content"></div>
+</section>
+
+<section id="addressPage" class="page">
+  <div class="form-box" style="max-width:600px;margin:auto;">
+    <h2 style="margin-bottom:20px;">Delivery Address</h2>
+
+    <label>Full Name</label>
+    <input type="text" id="addr-name" style="margin-bottom:10px;">
+
+    <label>Phone Number</label>
+    <input type="text" id="addr-phone" style="margin-bottom:10px;">
+
+    <label>Street Address</label>
+    <input type="text" id="addr-street" style="margin-bottom:10px;">
+
+    <label>City</label>
+    <input type="text" id="addr-city" style="margin-bottom:10px;">
+
+    <label>State</label>
+    <input type="text" id="addr-state" style="margin-bottom:10px;">
+
+    <label>Pincode</label>
+    <input type="text" id="addr-pin" style="margin-bottom:20px;">
+     
+    <button class="btn btn-yellow" onclick="saveAddressToMongo()" onclick="goToPayment()">Continue to Payment</button>
+  </div>
+</section>
+
+<section id="paymentPage" class="page">
+  <div class="payment-container">
+    <h2>Checkout</h2>
+    
+    <div class="method-selector">
+      <button class="method-btn active" onclick="showMethod('card')">Credit/Debit Card</button>
+      <button class="method-btn" onclick="showMethod('upi')">UPI</button>
+      <button class="method-btn" onclick="showMethod('cod')">Cash on Delivery</button>
+    </div>
+
+    <div class="form-box">
+      <div id="card-form" class="payment-method">
+        <label>Card Holder Name</label>
+        <input type="text" id="card-name" placeholder="John Doe">
+
+        <label>Card Number</label>
+        <input type="text" id="card-number" placeholder="1234 5678 9101 1121">
+
+        <div class="row">
+          <div class="col">
+            <label>Expiry Date</label>
+            <input type="text" id="card-expiry" placeholder="MM/YY">
+          </div>
+          <div class="col">
+            <label>CVV</label>
+            <input type="text" id="card-cvv" placeholder="123">
+          </div>
+        </div>
+      </div>
+
+      <div id="upi-form" class="payment-method" style="display:none;">
+        <label>Enter UPI ID</label>
+        <input type="text" id="upi-id" placeholder="username@upi">
+        <p class="info-text">You will receive a request on your UPI app.</p>
+      </div>
+
+      <div id="cod-form" class="payment-method" style="display:none;">
+        <p class="info-text">Pay with cash upon delivery of your order.</p>
+        <p><strong>Total Amount: To be paid at doorstep</strong></p>
+      </div>
+
+      <button class="btn btn-orange" id="pay-btn" onclick="savePaymentToMongo()">Place Order</button>
+    </div>
+  </div>
+</section>
+
+
+<section id="checkoutPage" class="page">
+    
+    <div class="form-box" style="max-width: 500px; margin: auto;">
+        <h2 style="margin-bottom:25px;">Shipping Information</h2>
+        <div style="margin-bottom: 15px;">
+            <label>Full Name</label>
+            <input type="text" id="ship-name">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label>Street Address</label>
+            <input type="text" id="ship-addr">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <input type="checkbox" id="save-to-profile" checked> Save to profile
+        </div>
+        <button class="btn btn-orange" onclick="placeOrder()">Confirm & Place Order</button>
+    </div>
+</section>
+
+<section id="profilePage" class="page">
+    <div style="max-width: 900px; margin: auto; display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+        <div class="form-box" style="height: fit-content;">
+            <h3>Session</h3><br>
+            <p id="p-email" style="color: #666;"></p><br>
+            <button class="btn btn-orange" onclick="logout()">Log Out</button>
+        </div>
+        <div class="form-box">
+            <h3>Account Settings</h3><br>
+            <label>Name:</label>
+            <input type="text" id="p-name-input" style="margin: 10px 0 20px 0;">
+            <button class="btn btn-yellow" onclick="updateName()">Update Name</button>
+            <hr style="margin:30px 0; opacity: 0.1;">
+            <h3>Saved Addresses</h3>
+            <div id="address-history" style="margin-top:15px;"></div>
+        </div>
+    </div>
+</section>
+
+<section id="loginPage" class="page">
+    <div class="form-box" style="max-width:400px; margin: 50px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+        <h2>Login / Signup</h2>
+        <div class="form-box">
+    <h3> Account Management </h3>
+    <button class="logout-User" onclick="logoutUser()"> Log Out</button>
+</div>
+        <div style="margin-bottom: 15px;">
+            <label>Name</label><br>
+            <input type="text" id="reg-name" style="width: 100%; padding: 8px;">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label>Email</label><br>
+            <input type="email" id="reg-email" style="width: 100%; padding: 8px;">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label>Phone</label><br>
+            <input type="text" id="reg-phone" style="width: 100%; padding: 8px;">
+        </div>
+        
+        <button class="btn btn-yellow"   onclick="submitToMongo()">Create Account</button>
+    </div>
+</section>
+
+
+
+<div class="sidebar" id="sidebar">
+    <button class="logout-User" onclick="showPage('productsPage')"> Back to Shop </button>
+    <h2 style="font-size: 28px;">Your Cart</h2><br>
+    <div id="cart-list" style="height:70%; overflow-y:auto;"></div>
+    <div style="border-top: 1px solid #eee; padding-top:20px;">
+        <h3 id="cart-total-text" style="font-size: 24px;">Total: ₹0</h3>
+        <button class="btn btn-yellow" style="margin-top: 15px;" onclick="goToCheckout()">Proceed to Checkout</button>
+    </div>
+</div>
+
+<footer>
+    <p style="font-size: 18px; font-weight: bold;">ShopCart</p>
+    <p style="opacity: 0.6; margin-top: 10px;">© 2026 ShopCart Digital Ltd. Handcrafted for you.</p>
+</footer>
+
+<script src="/script.js">
+
+</script>
+</body>
+</html>
