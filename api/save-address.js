@@ -16,14 +16,15 @@ const addressSchema = new mongoose.Schema({
 const Address = mongoose.models.Address || mongoose.model('Address', addressSchema);
 
 export default async function handler(req, res) {
-    if (req.method === 'POST') {
-        try {
-            const address = await Address.create(req.body);
-            res.status(201).json({ message: "Address saved successfully" });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    } else {
-        res.status(405).json({ error: "Method not allowed" });
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    try {
+        const address = await Address.create(req.body);
+        res.status(201).json({ message: "Address saved successfully!" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
     }
 }

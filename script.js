@@ -1,4 +1,4 @@
-// Splash auto redirect
+// ====================== SPLASH & PAGE NAVIGATION ======================
 setTimeout(() => {
     showPage('homePage');
 }, 10);
@@ -11,6 +11,7 @@ function showPage(pageId) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ====================== PRODUCTS DATA ======================
 const categoryImages = {
     'Phone': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=500&q=80',
     'Headphones': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80',
@@ -29,24 +30,23 @@ const products = Array.from({ length: 24 }, (_, i) => {
         name: `${productNames[i % productNames.length]} ${type} V${i + 1}`,
         price: 2000 + (i * 1500),
         img: categoryImages[type],
-        desc: `The ${type} reimagined. This ShopCart exclusive features premium materials, optimized battery performance, and a sleek curved aesthetic designed to fit your lifestyle.`
+        desc: `The ${type} reimagined. Premium materials, optimized battery, and sleek design.`
     };
 });
 
 let user = JSON.parse(localStorage.getItem('sc_user')) || null;
 let cart = [];
 
-// ==================== API BASE URL (Important for Local + Online) ====================
-const API_BASE = '';   // Empty = relative path (works perfectly on Vercel)                      // Empty = relative URL (works on Vercel/Render/Netlify when backend is on same domain)
+// ====================== API BASE FOR VERCEL ======================
+const API_BASE = '';   // Empty = works perfectly on Vercel ( /api/register )
 
-// =================================================================================
-
+// ====================== USER & HEADER ======================
 function handleAccountNav() {
     if (!user) {
-        const email = prompt("Enter email to sign in to ShopCart:");
+        const email = prompt("Enter email to sign in:");
         if (email) {
             user = { email, name: email.split('@')[0], addresses: [] };
-            save(); 
+            save();
             updateHeader();
         }
     } else {
@@ -57,11 +57,12 @@ function handleAccountNav() {
     }
 }
 
-function updateName() { 
-    user.name = document.getElementById('p-name-input').value; 
-    save(); 
-    updateHeader(); 
-    alert("Name saved!"); 
+function updateHeader() {
+    document.getElementById('user-display').innerText = user ? `Hello, ${user.name || user.email}` : "Hello, Sign in";
+}
+
+function save() {
+    localStorage.setItem('sc_user', JSON.stringify(user));
 }
 
 function logoutUser() {
@@ -72,17 +73,10 @@ function logoutUser() {
     alert("You have been logged out.");
 }
 
-function save() { 
-    localStorage.setItem('sc_user', JSON.stringify(user)); 
-}
-
-function updateHeader() { 
-    document.getElementById('user-display').innerText = user ? `Hello, ${user.name || user.email}` : "Hello, Sign in"; 
-}
-
+// ====================== PRODUCT DISPLAY ======================
 function init() {
     const grid = document.getElementById('main-grid');
-    grid.innerHTML = ''; // Clear first to avoid duplicates
+    grid.innerHTML = '';
     products.forEach(p => {
         grid.innerHTML += `
             <div class="p-card" onclick="viewProduct(${p.id})">
@@ -110,31 +104,32 @@ function viewProduct(id) {
 }
 
 function addToCart(id) {
-    if (!user) return alert("Please sign in!");
+    if (!user) return alert("Please sign in first!");
     cart.push(products.find(x => x.id === id));
     document.getElementById('cart-count').innerText = cart.length;
     alert("Added to Cart!");
 }
 
 function buyNow(id) {
-    if (!user) return alert("Please sign in!");
+    if (!user) return alert("Please sign in first!");
     cart = [products.find(x => x.id === id)];
     goToCheckout();
 }
 
+// ====================== CHECKOUT FLOW ======================
 function goToCheckout() {
     if (!user) return alert("Sign in first!");
-    if (!cart.length) return alert("Cart empty!");
-    document.getElementById('sidebar').classList.remove('open');
+    if (!cart.length) return alert("Cart is empty!");
     showPage('addressPage');
 }
 
 function goToPayment() {
-    const street = document.getElementById('addr-street').value;
-    if (!street) return alert("Fill address!");
+    const street = document.getElementById('addr-street').value.trim();
+    if (!street) return alert("Please fill address!");
     showPage('paymentPage');
 }
 
+// ====================== REGISTER ======================
 async function submitToMongo() {
     const name = document.getElementById('reg-name').value.trim();
     const email = document.getElementById('reg-email').value.trim();
@@ -145,30 +140,31 @@ async function submitToMongo() {
         return;
     }
 
-    const userData = { name, email, phone };
-
     try {
-        const response = await fetch(`${API_BASE}/register`, {
+        const response = await fetch(`${API_BASE}/api/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData)
+            body: JSON.stringify({ name, email, phone })
         });
 
+        const data = await response.json();
+
         if (response.ok) {
-            alert("Account Created Successfully!");
-            localStorage.setItem('sc_user', JSON.stringify(userData));
-            user = userData;
+            alert("Account Created Successfully! 🎉");
+            user = { name, email, phone };
+            localStorage.setItem('sc_user', JSON.stringify(user));
             updateHeader();
             showPage('homePage');
         } else {
-            alert("Registration failed. Try again.");
+            alert("Registration failed: " + (data.error || "Unknown error"));
         }
     } catch (error) {
-        console.error("Error:", error);
-        alert("Could not connect to the server.\nIs your backend (node server.js) running?");
+        console.error(error);
+        alert("Could not connect to server. Please check if backend is deployed.");
     }
 }
 
+// ====================== SAVE ADDRESS ======================
 async function saveAddressToMongo() {
     const addressData = {
         fullName: document.getElementById('addr-name').value.trim(),
@@ -180,45 +176,41 @@ async function saveAddressToMongo() {
     };
 
     if (!addressData.fullName || !addressData.street) {
-        alert("Please fill in the required address fields.");
+        alert("Please fill required address fields!");
         return;
     }
 
     try {
-        const response = await fetch(`${API_BASE}/save-address`, {
+        const response = await fetch(`${API_BASE}/api/save-address`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(addressData)
         });
 
         if (response.ok) {
-            alert("Delivery address saved!");
+            alert("Address saved successfully!");
             showPage('paymentPage');
         } else {
             alert("Failed to save address.");
         }
     } catch (error) {
-        console.error("Error:", error);
-        alert("Could not save address. Is the server running?");
+        alert("Could not save address. Server error.");
     }
 }
 
+// ====================== PAYMENT ======================
 let selectedMethod = 'card';
 
 function showMethod(method) {
     selectedMethod = method;
     document.querySelectorAll('.payment-method').forEach(div => div.style.display = 'none');
     document.querySelectorAll('.method-btn').forEach(btn => btn.classList.remove('active'));
-    
     document.getElementById(`${method}-form`).style.display = 'block';
     event.target.classList.add('active');
 }
 
 async function savePaymentToMongo() {
-    const paymentData = { 
-        method: selectedMethod, 
-        details: {} 
-    };
+    const paymentData = { method: selectedMethod, details: {} };
 
     if (selectedMethod === 'card') {
         paymentData.details = {
@@ -234,51 +226,58 @@ async function savePaymentToMongo() {
     }
 
     try {
-        const response = await fetch(`${API_BASE}/save-payment`, {
+        const response = await fetch(`${API_BASE}/api/save-payment`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(paymentData)
         });
 
         if (response.ok) {
-            alert("Order Placed Successfully!");
+            alert("Order Placed Successfully! 🎉");
             finalOrder();
         } else {
-            alert("Failed to save order.");
+            alert("Failed to place order.");
         }
     } catch (error) {
-        console.error("Error:", error);
-        alert("Server error. Check your connection.");
+        alert("Server error while placing order.");
     }
 }
 
 function finalOrder() {
-    alert("Payment Successful! Order Placed 🎉");
     cart = [];
     document.getElementById('cart-count').innerText = "0";
     showPage('homePage');
 }
 
+// ====================== OTHER FUNCTIONS ======================
 function renderSavedAddresses() {
     const box = document.getElementById('address-history');
-    box.innerHTML = user.addresses && user.addresses.length 
-        ? '' 
-        : 'No addresses saved.';
+    box.innerHTML = (user.addresses && user.addresses.length) ? '' : 'No addresses saved.';
     (user.addresses || []).forEach(a => {
-        box.innerHTML += `<div style="padding:15px; background:#f9f9f9; border-radius:12px; margin-bottom:10px; border:1px solid #eee;">${a}</div>`;
+        box.innerHTML += `<div style="padding:15px; background:#f9f9f9; border-radius:12px; margin-bottom:10px;">${a}</div>`;
     });
 }
 
 function openCart() {
     const list = document.getElementById('cart-list');
-    list.innerHTML = ''; 
+    list.innerHTML = '';
     let sum = 0;
-    cart.forEach(it => { 
-        sum += it.price; 
-        list.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; margin-bottom:10px;"><b>${it.name}</b><br>₹${it.price}</div>`; 
+    cart.forEach(item => {
+        sum += item.price;
+        list.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; margin-bottom:10px;"><b>${item.name}</b><br>₹${item.price}</div>`;
     });
     document.getElementById('cart-total-text').innerText = "Total: ₹" + sum.toLocaleString();
     document.getElementById('sidebar').classList.add('open');
 }
 
+function updateName() {
+    if (user) {
+        user.name = document.getElementById('p-name-input').value;
+        save();
+        updateHeader();
+        alert("Name updated!");
+    }
+}
+
+// Initialize
 init();

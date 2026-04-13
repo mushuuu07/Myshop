@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB connected in register'))
+  .catch(err => console.error('MongoDB error:', err));
 
 const userSchema = new mongoose.Schema({
     name: String,
@@ -13,26 +15,26 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 export default async function handler(req, res) {
-    if (req.method === 'POST') {
-        try {
-            const { name, email, phone } = req.body;
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
 
-            if (!name || !email || !phone) {
-                return res.status(400).json({ error: "All fields are required" });
-            }
+    try {
+        const { name, email, phone } = req.body;
 
-            const newUser = await User.create({ name, email, phone });
-
-            res.status(201).json({ 
-                success: true, 
-                message: "User registered successfully",
-                user: newUser 
-            });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: error.message });
+        if (!name || !email || !phone) {
+            return res.status(400).json({ error: "All fields are required" });
         }
-    } else {
-        res.status(405).json({ error: "Method not allowed" });
+
+        const newUser = await User.create({ name, email, phone });
+
+        res.status(201).json({ 
+            success: true, 
+            message: "Account created successfully!", 
+            user: newUser 
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
     }
 }
